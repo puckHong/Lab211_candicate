@@ -6,6 +6,7 @@ package controller;
 
 import Common.Library;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 import model.Candidate;
 import model.ExperienceCandidate;
 import model.FresherCandidate;
@@ -25,13 +26,29 @@ public class CandidateManagerment extends Menu<String> {
     public CandidateManagerment() {
         super("Candidate Application", choices, "Exit");
     }
-    
+
     ArrayList<Candidate> listCan = new ArrayList<>();
 
     public void displayA() {
         for (Candidate can : listCan) {
             System.out.println(can);
         }
+    }
+
+    public void displayB(ArrayList<Candidate> cd1) {
+        for (Candidate cd : cd1) {
+            System.out.println((cd.getFirstName() + " " + cd.getLastName()) + "|" + cd.getBirthDate() + "|" + cd.getAddress() + "|" + cd.getPhone() + "|" + cd.getEmail() + "|" + cd.getCadidateType());
+        }
+    }
+
+    public ArrayList<Candidate> search(Predicate<Candidate> cd) {
+        ArrayList<Candidate> subList = new ArrayList<>();
+        for (Candidate d : listCan) {
+            if (cd.test(d)) {
+                subList.add(d);
+            }
+        }
+        return subList;
     }
 
     @Override
@@ -88,39 +105,14 @@ public class CandidateManagerment extends Menu<String> {
             }
             case 4: {
                 displayA();
-                String title = "Searching app";
-                String[] choices = {"Search by FirstName and TypeCandidate ", "Search by LastName and TypeCandidate"};
-
-                Menu m = new Menu(title, choices, "Exit") {
-                    @Override
-                    public void execute(int n)  {
-                        switch(n) { 
-                            case 1: { 
-                                String firstName = lib.getValue("Input firstName you want to search:");
-                                int typeCandi = lib.getInt("Input type candidate you want to search(1./Experience, 2./Fresher , 3./Intern:");
-                                        
-                                for(Candidate cd : listCan) { 
-                                    if (cd.getFirstName().equals(firstName) && cd.getCadidateType()==typeCandi ) {
-                                        System.out.println((cd.getFirstName()+cd.getLastName())+"|"+cd.getBirthDate()+"|"+cd.getAddress() +"|"+cd.getPhone()+"|"+cd.getEmail()+"|"+cd.getCadidateType());
-                                    }
-                                }
-                                break;
-                            }
-                              case 2: { 
-                                String lastName = lib.getValue("Input lastName you want to search:");
-                                int typeCandi = lib.getInt("Input type candidate you want to search(1./Experience, 2./Fresher , 3./Intern:");
-                                for(Candidate cd : listCan) { 
-                                    if (cd.getLastName().equals(lastName) && cd.getCadidateType()==typeCandi ) {
-                                        System.out.println((cd.getFirstName()+cd.getLastName())+"|"+cd.getBirthDate()+"|"+cd.getAddress() +"|"+cd.getPhone()+"|"+cd.getEmail()+"|"+cd.getCadidateType());
-                                    }
-                                    break;
-                                }
-                                break;
-                            }
-                        }
-                    }
-                };
-                m.run();
+                String firstName = lib.getValue("Input firstName or lastName you want to search:");
+                int typeCandi = lib.getInt("Input type candidate you want to search(1./Experience, 2./Fresher , 3./Intern:");
+                ArrayList<Candidate> subLL = search(kkk -> (kkk.getFirstName().equals(firstName) || kkk.getLastName().equals(firstName)) && (kkk.getCadidateType() == typeCandi));
+                if (subLL.isEmpty()) {
+                    System.out.println("No exist.");
+                } else {
+                    displayB(subLL);
+                }
             }
         }
     }
